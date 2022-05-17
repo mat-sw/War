@@ -49,7 +49,7 @@ void mainLoop() {
             } else if (state == BeforeMechWait) {
                 println("Czekam na mechaników!");
 		        changeState( InSend );
-            	int necessary_mechs = random()%(int)(MECHANICS_COUNT / 2) + 1;
+            	int necessary_mechs = random()%(int)(MECHANICS_COUNT / 2) + 1; // Teraz 1 - 5
                 pkt->mech_count = necessary_mechs;
                 
                 sleep( SEC_IN_STATE );
@@ -98,16 +98,16 @@ void mainLoop() {
                 // Usun sie z kolejki
                 pthread_mutex_lock( &vecDockMut );
                 for (int i = 0; i < dock_tab.size(); i++) {
-                    if (std::get<1>(dock_tab(i) == pkt->src)) {
-                        dock_tab.erase(dock_tab.begin() + i)
+                    if (std::get<1>(dock_tab.at(i)) == rank) {
+                        dock_tab.erase(dock_tab.begin() + i);
                     }
                 }
                 pthread_mutex_unlock( &vecDockMut );
 
                 pthread_mutex_lock( &vecMechMut );
                 for (int i = 0; i < mech_tab.size(); i++) {
-                    if (std::get<1>(mech_tab(i) == pkt->src)) {
-                        mech_tab.erase(mech_tab.begin() + i)
+                    if (std::get<1>(mech_tab.at(i)) == rank) {
+                        mech_tab.erase(mech_tab.begin() + i);
                     }
                 }
                 pthread_mutex_unlock( &vecMechMut );
