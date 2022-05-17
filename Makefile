@@ -1,6 +1,6 @@
 SOURCES=$(wildcard *.cpp)
 HEADERS=$(SOURCES:.cpp=.hpp)
-FLAGS=-DDEBUG -g
+FLAGS=-DDEBUG -g -pthread
 
 main: $(SOURCES) $(HEADERS)
 	mpic++ $(SOURCES) $(FLAGS) -o main
@@ -12,3 +12,6 @@ clean:
 
 run: main
 	mpirun -mca btl tcp -mca pml ^ucx -hostfile hostfile -oversubscribe -np 8 ./main
+
+local: main
+	mpirun -np 4 ./main
