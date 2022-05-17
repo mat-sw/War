@@ -45,6 +45,7 @@ void mainLoop() {
                         std::cout << std::get<0>(i) << " " << std::get<1>(i) << ", ";
                     changeState( BeforeMechWait );
                 }
+                sleep( SEC_IN_STATE );
             } else if (state == BeforeMechWait) {
                 println("Czekam na mechaników!");
 		        changeState( InSend );
@@ -74,24 +75,42 @@ void mainLoop() {
                 int index = it - mech_tab.begin();
                 pthread_mutex_unlock( &vecMechMut );
 
-                for (auto i = mech_tab.begin(); i <= it; i++) {
+                for (int i = 0; i <= index; i++) {
                     used_mechs += std::get<2>(mech_tab.at(i));
                     if (used_mechs > MECHANICS_COUNT) 
                         break;
                 }
 
+                // sprawdzenie kolejki na mechanikow
                 if (used_mechs <= MECHANICS_COUNT) {
+                    for (auto i: mech_tab)
+                        std::cout << std::get<0>(i) << " " << std::get<1>(i) << " " << std::get<2>(i) << ", ";
                     changeState( InRepair );
                 }
 
+                sleep( SEC_IN_STATE );
 
-                // sprawdzenie kolejki na mechanikow
             } else if (state == InRepair) {
                 println("Jestem naprawiany");
                 sleep( random() % 4 + 2 ); // sleep 2 - 5
                 changeTime( lamportTime + 1 );
 
-                // usun sie z kolejki
+                // Usun sie z kolejki
+                pthread_mutex_lock( &vecDockMut );
+                for (int i = 0; i < dock_tab.size(); i++) {
+                    if (std::get<1>(dock_tab(i) == pkt->src)) {
+                        dock_tab.erase(dock_tab.begin() + i)
+                    }
+                }
+                pthread_mutex_unlock( &vecDockMut );
+
+                pthread_mutex_lock( &vecMechMut );
+                for (int i = 0; i < mech_tab.size(); i++) {
+                    if (std::get<1>(mech_tab(i) == pkt->src)) {
+                        mech_tab.erase(mech_tab.begin() + i)
+                    }
+                }
+                pthread_mutex_unlock( &vecMechMut );
 
                 for (int i = 0; i < size; i++) {
                     if (i != rank)

@@ -58,7 +58,22 @@ void *startComThread(void *ptr) {
                 }
                 break;
             case RELEASE: // TODO Inny statek opuścił dok
+                println("Statek %d opuszcza port i wraca do bitwy", pkt->src);
+                pthread_mutex_lock( &vecDockMut );
+                for (int i = 0; i < dock_tab.size(); i++) {
+                    if (std::get<1>(dock_tab(i) == pkt->src)) {
+                        dock_tab.erase(dock_tab.begin() + i)
+                    }
+                }
+                pthread_mutex_unlock( &vecDockMut );
 
+                pthread_mutex_lock( &vecMechMut );
+                for (int i = 0; i < mech_tab.size(); i++) {
+                    if (std::get<1>(mech_tab(i) == pkt->src)) {
+                        mech_tab.erase(mech_tab.begin() + i)
+                    }
+                }
+                pthread_mutex_unlock( &vecMechMut );
                 break;
             default:
 
