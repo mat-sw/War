@@ -12,7 +12,7 @@ std::vector<std::tuple<int, int, int>> mech_tab; // tablica na kolejkę dostępu
 
 int lamportTime;
 int size, rank, mechanics, docks;
-state_t stan = BeforeDockWait;
+state_t state = BeforeDockWait;
 MPI_Datatype MPI_PAKIET_T;
 pthread_t threadCom;
 
@@ -87,11 +87,11 @@ void sendPacket(packet_t *pkt, int destination, int tag) {
 
 void changeState( state_t newState ) {
     pthread_mutex_lock( &stateMut );
-    if (stan == InFinish) { 
+    if (state == InFinish) { 
 	    pthread_mutex_unlock( &stateMut );
         return;
     }
-    stan = newState;
+    state = newState;
     pthread_mutex_unlock( &stateMut );
 }
 

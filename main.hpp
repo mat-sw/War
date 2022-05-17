@@ -36,8 +36,8 @@
 #define RELEASE 5 // zwolnienie obu zasobów przez proces
 #define FINISH 6 // koniec programu
 
-typedef enum {InRun, BeforeDockWait, InDockWait, BeforeMechWait, InMechWait, InSend, InFinish} state_t;
-extern state_t stan;
+typedef enum {BeforeDockWait, InDockWait, BeforeMechWait, InMechWait, InRepair, InSend, InFinish} state_t;
+extern state_t state;
 extern int rank;
 extern int size;
 extern int mechanics; // Ilość dostępnych mechaników
