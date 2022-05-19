@@ -4,14 +4,14 @@
 /* wątek komunikacyjny; zajmuje się odbiorem i reakcją na komunikaty */
 void *startComThread(void *ptr) {
     
-    int ack1_count = 0, ack2_count = 0;
+    int ack1_count = 0, ack2_count = 0, destination;
     MPI_Status status;
     packet_t pkt;
     /* Obrazuje pętlę odbierającą pakiety o różnych typach */
     while ( state != InFinish ) {
         MPI_Recv( &pkt, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status );
         changeTime(max(lamportTime, pkt.ts) + 1);
-	    println("Dostałem wiadomość od %d\n o tagu %d", pkt.src, status.MPI_TAG);
+	    println("Dostałem wiadomość od %d o tagu %d", pkt.src, status.MPI_TAG);
         switch ( status.MPI_TAG ) {
             case FINISH: // Ktoś chce zakończyć wojnę
                 println("Kończymy wojnę!\n")
@@ -26,7 +26,7 @@ void *startComThread(void *ptr) {
                 pthread_mutex_unlock( &vecDockMut );
 
                 changeTime( lamportTime + 1 );
-                MPI_Send( &pkt, 1, MPI_PAKIET_T, pkt.src, ACK1, MPI_COMM_WORLD );
+                sendPacket(&pkt, pkt.src, ACK1);
                 break;
             case REQ2: // Odbieram żądanie mechaników innego statku
                 pthread_mutex_lock( &vecMechMut );
@@ -37,7 +37,7 @@ void *startComThread(void *ptr) {
                 pthread_mutex_unlock( &vecMechMut );
 
                 changeTime( lamportTime + 1 );
-                MPI_Send( &pkt, 1, MPI_PAKIET_T, pkt.src, ACK2, MPI_COMM_WORLD );
+                sendPacket(&pkt, pkt.src, ACK2);
                 break;
             case ACK1: // Odbieram potwierdzenie dostępu do doku od innego statku
                 ack1_count++;
@@ -54,7 +54,7 @@ void *startComThread(void *ptr) {
                 }
                 break;
             case RELEASE: // Inny statek opuścił dok
-                println("Statek %d opuszcza port i wraca do bitwy", pkt.src);
+                // println("Statek %d opuszcza port i wraca do bitwy", pkt.src);
                 pthread_mutex_lock( &vecDockMut );
                 for (int i = 0; i < dock_tab.size(); i++) {
                     if (std::get<1>(dock_tab.at(i)) == pkt.src) {

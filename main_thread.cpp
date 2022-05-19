@@ -17,7 +17,7 @@ void mainLoop() {
                 
                 sleep( SEC_IN_STATE ); // to nam zasymuluje, że wiadomość trochę leci w kanale
                 changeTime(lamportTime + 1);
-		        println("Ubiegam się o dok\n");
+		        println("Ubiegam się o dok");
                 myDockReq = std::make_tuple(lamportTime, rank);
 
                 pthread_mutex_lock( &vecDockMut );
