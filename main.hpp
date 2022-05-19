@@ -7,6 +7,7 @@
 #include <stddef.h>
 #include <unistd.h>
 #include <cstring>
+#include <sstream>
 #include <pthread.h>
 #include <iostream>
 #include <vector>
@@ -25,8 +26,8 @@
 
 // GLOBALS
 #define SHIP_COUNT 8 // Okrety
-#define DOCKS_COUNT 5 // Doki
-#define MECHANICS_COUNT 10 // Mechanicy
+#define DOCKS_COUNT 3 // Doki 5
+#define MECHANICS_COUNT 6 // Mechanicy 10
 
 // typy wiadomości
 #define REQ1 1 // żądanie dostępu do zasobu doków

@@ -112,7 +112,7 @@ int main(int argc, char ** argv) {
     init(&argc, &argv);
     mechanics = MECHANICS_COUNT;
     docks = DOCKS_COUNT;
-    std::cout << "Hello world: "<< rank <<" of "<< size <<std::endl;
+    std::cout << "Hello world: " << rank << " of " << size << std::endl;
     mainLoop();
     finalize();
     return 0;

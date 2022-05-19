@@ -2,8 +2,6 @@
 #include "main_thread.hpp"
 
 void mainLoop() {
-    // std::vector<std::tuple<int, int>> dock_tab; // tablica na kolejkę dostępu do doków
-    // std::vector<std::tuple<int, int, int>> mech_tab; // tablica na kolejkę dostępu do mechaników
     srandom(rank);
     std::tuple<int, int> myDockReq;
     std::tuple<int, int, int> myMechReq;
@@ -14,12 +12,12 @@ void mainLoop() {
         if (perc < STATE_CHANGE_PROB) {
             packet_t *pkt = new packet_t;
             if (state == BeforeDockWait) {
-		        debug("Ubiegam się o dok!\n");
 		        changeState( InSend );
             	pkt->mech_count = 1; // nieużywane ale trzeba wpisać
                 
                 sleep( SEC_IN_STATE ); // to nam zasymuluje, że wiadomość trochę leci w kanale
                 changeTime(lamportTime + 1);
+		        println("Ubiegam się o dok\n");
                 myDockReq = std::make_tuple(lamportTime, rank);
 
                 pthread_mutex_lock( &vecDockMut );
@@ -31,29 +29,34 @@ void mainLoop() {
                     if (i != rank)
                         sendPacket( pkt, i, REQ1 );
                 }
-                
-            	debug("Skończyłem wysyłać REQ1");
-            } else if (state == InDockWait) {
+            } 
+            else if (state == InDockWait) {
                 pthread_mutex_lock( &vecDockMut );
                 auto it = std::find(dock_tab.begin(), dock_tab.end(), myDockReq);
                 int index = it - dock_tab.begin();
                 pthread_mutex_unlock( &vecDockMut );
 
                 if (index < DOCKS_COUNT) {
-                    println("Wchodzę do doku");
-                    for (auto i: dock_tab)
-                        std::cout << std::get<0>(i) << " " << std::get<1>(i) << ", ";
+                    std::stringstream tab_msg;
+
+                    pthread_mutex_lock( &vecDockMut );
+                    for (auto i: dock_tab) 
+                        tab_msg << "ts: " << std::get<0>(i) << " r: " << std::get<1>(i) << ", ";
+                    pthread_mutex_unlock( &vecDockMut );
+                    
+                    println("Wchodzę do doku przy stanie %s", tab_msg.str().c_str());
                     changeState( BeforeMechWait );
                 }
                 sleep( SEC_IN_STATE );
-            } else if (state == BeforeMechWait) {
-                println("Czekam na mechaników!");
+            } 
+            else if (state == BeforeMechWait) {
 		        changeState( InSend );
-            	int necessary_mechs = random()%(int)(MECHANICS_COUNT / 2) + 1; // Teraz 1 - 5
+            	int necessary_mechs = random()%4 + 2;;//random()%(int)(MECHANICS_COUNT / 2) + 1; // Domyślnie 1 - 5
                 pkt->mech_count = necessary_mechs;
                 
                 sleep( SEC_IN_STATE );
                 changeTime(lamportTime + 1);
+                println("Ubiegam się o mechaników!");
                 myMechReq = std::make_tuple(lamportTime, rank, necessary_mechs);
 
                 pthread_mutex_lock( &vecMechMut );
@@ -62,36 +65,44 @@ void mainLoop() {
                 pthread_mutex_unlock( &vecMechMut );
 
                 for (int i = 0; i < size; i++) {
-                    if (i != rank)
+                    if (i != rank) {
                         sendPacket( pkt, i, REQ2 );
-                }                
-
-            	debug("Skończyłem wysyłać REQ2");
-            } else if (state == InMechWait) {
-                // Znajdź siebie
+                    }
+                }
+            } 
+            else if (state == InMechWait) {
                 int used_mechs = 0;
+
+                // Znajdź siebie
                 pthread_mutex_lock( &vecMechMut );
                 auto it = std::find(mech_tab.begin(), mech_tab.end(), myMechReq);
                 int index = it - mech_tab.begin();
                 pthread_mutex_unlock( &vecMechMut );
 
+                // sprawdzenie kolejki na mechanikow
+                pthread_mutex_lock( &vecMechMut );
                 for (int i = 0; i <= index; i++) {
                     used_mechs += std::get<2>(mech_tab.at(i));
                     if (used_mechs > MECHANICS_COUNT) 
                         break;
                 }
+                pthread_mutex_unlock( &vecMechMut );
 
-                // sprawdzenie kolejki na mechanikow
                 if (used_mechs <= MECHANICS_COUNT) {
+                    std::stringstream tab_msg;
+
+                    pthread_mutex_lock( &vecMechMut );
                     for (auto i: mech_tab)
-                        std::cout << std::get<0>(i) << " " << std::get<1>(i) << " " << std::get<2>(i) << ", ";
+                        tab_msg << "ts: " << std::get<0>(i) << " r: " << std::get<1>(i) << " m: " << std::get<2>(i) << ", ";
+                    pthread_mutex_unlock( &vecMechMut );
+                    
+                    println("Zaczynam naprawę przy stanie %s", tab_msg.str().c_str());
                     changeState( InRepair );
                 }
 
                 sleep( SEC_IN_STATE );
-
-            } else if (state == InRepair) {
-                println("Jestem naprawiany");
+            } 
+            else if (state == InRepair) {
                 sleep( random() % 4 + 2 ); // sleep 2 - 5
                 changeTime( lamportTime + 1 );
 
@@ -111,18 +122,20 @@ void mainLoop() {
                     }
                 }
                 pthread_mutex_unlock( &vecMechMut );
+                
+                changeTime( lamportTime + 1 );
+                println("Kończę naprawę! Do boju!");
 
                 for (int i = 0; i < size; i++) {
                     if (i != rank)
                         sendPacket( pkt, i, RELEASE );
                 }
-                println("Kończę naprawę! Do boju!");
-                sleep( SEC_IN_STATE );
+                sleep( SEC_IN_STATE * 2 );
                 changeState( BeforeDockWait );
-            } else { }
+            } 
+            else { }
 
         }
-        println("Idę spać\n");
         sleep(SEC_IN_STATE);
     }
 }
