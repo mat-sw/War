@@ -4,7 +4,7 @@
 /* wątek komunikacyjny; zajmuje się odbiorem i reakcją na komunikaty */
 void *startComThread(void *ptr) {
     
-    int ack1_count = 0, ack2_count = 0, destination;
+    int ack1_count = 0, ack2_count = 0;
     MPI_Status status;
     packet_t pkt;
     /* Obrazuje pętlę odbierającą pakiety o różnych typach */

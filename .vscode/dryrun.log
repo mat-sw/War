@@ -1,3 +1,4 @@
+make.exe --dry-run --always-make --keep-going --print-directory
 MAKE Version 5.41  Copyright (c) 1987, 2014 Embarcadero Technologies, Inc.
 Incorrect command line argument: --dry-run
 
@@ -21,8 +22,7 @@ Syntax: MAKE [options ...] target[s]
     -e                Ignores redefinition of environment variable macros
     -i                Ignores errors returned by commands
     -l+               Enables use of long command lines
-    -m 
-                Displays the date and time stamp of each file
+    -m                Displays the date and time stamp of each file
     -n                Prints commands but does not do them
     -p                Displays all macro definitions and implicit rules
     -q                Returns zero if target is up-to-date and nonzero

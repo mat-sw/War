@@ -5,6 +5,7 @@ void mainLoop() {
     srandom(rank);
     std::tuple<int, int> myDockReq;
     std::tuple<int, int, int> myMechReq;
+    std::stringstream tab_msg;
 
     while (state != InFinish) {
         int perc = random()%100; 
@@ -37,14 +38,13 @@ void mainLoop() {
                 pthread_mutex_unlock( &vecDockMut );
 
                 if (index < DOCKS_COUNT) {
-                    std::stringstream tab_msg;
-
                     pthread_mutex_lock( &vecDockMut );
                     for (auto i: dock_tab) 
                         tab_msg << "ts: " << std::get<0>(i) << " r: " << std::get<1>(i) << ", ";
                     pthread_mutex_unlock( &vecDockMut );
                     
                     println("Wchodzę do doku przy stanie %s", tab_msg.str().c_str());
+                    tab_msg.str("");
                     changeState( BeforeMechWait );
                 }
                 sleep( SEC_IN_STATE );
@@ -89,14 +89,13 @@ void mainLoop() {
                 pthread_mutex_unlock( &vecMechMut );
 
                 if (used_mechs <= MECHANICS_COUNT) {
-                    std::stringstream tab_msg;
-
                     pthread_mutex_lock( &vecMechMut );
                     for (auto i: mech_tab)
                         tab_msg << "ts: " << std::get<0>(i) << " r: " << std::get<1>(i) << " m: " << std::get<2>(i) << ", ";
                     pthread_mutex_unlock( &vecMechMut );
                     
                     println("Zaczynam naprawę przy stanie %s", tab_msg.str().c_str());
+                    tab_msg.str("");
                     changeState( InRepair );
                 }
 
@@ -130,11 +129,10 @@ void mainLoop() {
                     if (i != rank)
                         sendPacket( pkt, i, RELEASE );
                 }
-                sleep( SEC_IN_STATE * 2 );
+                sleep( SEC_IN_STATE * 3 );
                 changeState( BeforeDockWait );
             } 
             else { }
-
         }
         sleep(SEC_IN_STATE);
     }
