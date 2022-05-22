@@ -51,7 +51,7 @@ void mainLoop() {
             } 
             else if (state == BeforeMechWait) {
 		        changeState( InSend );
-            	int necessary_mechs = random()%4 + 2;;//random()%(int)(MECHANICS_COUNT / 2) + 1; // Domyślnie 1 - 5
+            	int necessary_mechs = random()%4 + 2;//random()%(int)(MECHANICS_COUNT / 2) + 1; // Domyślnie 1 - 5
                 pkt->mech_count = necessary_mechs;
                 
                 sleep( SEC_IN_STATE );
@@ -103,7 +103,7 @@ void mainLoop() {
             } 
             else if (state == InRepair) {
                 sleep( random() % 4 + 2 ); // sleep 2 - 5
-                changeTime( lamportTime + 1 );
+                // changeTime( lamportTime + 1 );
 
                 // Usun sie z kolejki
                 pthread_mutex_lock( &vecDockMut );

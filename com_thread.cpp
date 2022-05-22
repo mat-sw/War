@@ -54,7 +54,6 @@ void *startComThread(void *ptr) {
                 }
                 break;
             case RELEASE: // Inny statek opuścił dok
-                // println("Statek %d opuszcza port i wraca do bitwy", pkt.src);
                 pthread_mutex_lock( &vecDockMut );
                 for (int i = 0; i < dock_tab.size(); i++) {
                     if (std::get<1>(dock_tab.at(i)) == pkt.src) {
