@@ -26,8 +26,8 @@
 
 // GLOBALS
 #define SHIP_COUNT 8 // Okrety
-#define DOCKS_COUNT 3 // Doki 5
-#define MECHANICS_COUNT 6 // Mechanicy 10
+#define DOCKS_COUNT 5 // Doki 5
+#define MECHANICS_COUNT 10 // Mechanicy 10
 
 // typy wiadomości
 #define REQ1 1 // żądanie dostępu do zasobu doków
@@ -56,6 +56,7 @@ typedef struct {
 extern MPI_Datatype MPI_PAKIET_T;
 extern pthread_mutex_t vecDockMut;
 extern pthread_mutex_t vecMechMut;
+extern pthread_mutex_t lamportMut;
 
 
 #ifdef DEBUG

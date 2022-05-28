@@ -16,10 +16,14 @@ void mainLoop() {
 		        changeState( InSend );
             	pkt->mech_count = 1; // nieużywane ale trzeba wpisać
                 
-                sleep( SEC_IN_STATE ); // to nam zasymuluje, że wiadomość trochę leci w kanale
+                sleep( SEC_IN_STATE );
                 changeTime(lamportTime + 1);
 		        println("Ubiegam się o dok");
+
+                pthread_mutex_lock( &lamportMut );
                 myDockReq = std::make_tuple(lamportTime, rank);
+                pkt->ts = lamportTime;
+                pthread_mutex_unlock( &lamportMut );
 
                 pthread_mutex_lock( &vecDockMut );
                 dock_tab.push_back(myDockReq);
@@ -51,13 +55,16 @@ void mainLoop() {
             } 
             else if (state == BeforeMechWait) {
 		        changeState( InSend );
-            	int necessary_mechs = random()%4 + 2;//random()%(int)(MECHANICS_COUNT / 2) + 1; // Domyślnie 1 - 5
+            	int necessary_mechs = random()%(int)(MECHANICS_COUNT / 2) + 1; // Domyślnie 1 - 5
                 pkt->mech_count = necessary_mechs;
                 
                 sleep( SEC_IN_STATE );
                 changeTime(lamportTime + 1);
                 println("Ubiegam się o mechaników!");
+                pthread_mutex_lock( &lamportMut );
                 myMechReq = std::make_tuple(lamportTime, rank, necessary_mechs);
+                pkt->ts = lamportTime;
+                pthread_mutex_unlock( &lamportMut );
 
                 pthread_mutex_lock( &vecMechMut );
                 mech_tab.push_back(myMechReq);
@@ -103,7 +110,6 @@ void mainLoop() {
             } 
             else if (state == InRepair) {
                 sleep( random() % 4 + 2 ); // sleep 2 - 5
-                // changeTime( lamportTime + 1 );
 
                 // Usun sie z kolejki
                 pthread_mutex_lock( &vecDockMut );
@@ -123,6 +129,7 @@ void mainLoop() {
                 pthread_mutex_unlock( &vecMechMut );
                 
                 changeTime( lamportTime + 1 );
+                pkt->ts = lamportTime;
                 println("Kończę naprawę! Do boju!");
 
                 for (int i = 0; i < size; i++) {

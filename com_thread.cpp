@@ -11,7 +11,6 @@ void *startComThread(void *ptr) {
     while ( state != InFinish ) {
         MPI_Recv( &pkt, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status );
         changeTime(max(lamportTime, pkt.ts) + 1);
-	    println("Dostałem wiadomość od %d o tagu %d", pkt.src, status.MPI_TAG);
         switch ( status.MPI_TAG ) {
             case FINISH: // Ktoś chce zakończyć wojnę
                 println("Kończymy wojnę!\n")

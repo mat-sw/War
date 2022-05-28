@@ -11,7 +11,7 @@ clean:
 	rm main
 
 run: main
-	mpirun -mca btl tcp -mca pml ^ucx -hostfile hostfile -oversubscribe -np 8 ./main
+	mpirun -mca btl tcp -mca pml ^ucx -hostfile hostfile -oversubscribe -np 12 ./main
 
 local: main
-	mpirun -np 4 ./main
+	mpirun -np 8 ./main

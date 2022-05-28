@@ -17,7 +17,6 @@ MPI_Datatype MPI_PAKIET_T;
 pthread_t threadCom;
 
 void check_thread_support(int provided) {
-    printf("THREAD SUPPORT: chcemy %d. Co otrzymamy?\n", provided);
     switch (provided) {
         case MPI_THREAD_SINGLE:
             printf("Brak wsparcia dla wątków, kończę\n");
@@ -79,7 +78,7 @@ void sendPacket(packet_t *pkt, int destination, int tag) {
         freepkt = true;
     }
     pkt->src = rank;
-    pkt->ts = lamportTime;
+    // pkt->ts = lamportTime;
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD );
     if (freepkt) delete pkt;
 }
