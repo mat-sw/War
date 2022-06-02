@@ -3,7 +3,7 @@ HEADERS=$(SOURCES:.cpp=.hpp)
 FLAGS=-DDEBUG -g -pthread
 
 main: $(SOURCES) $(HEADERS)
-	mpic++ $(SOURCES) $(FLAGS) -o main
+	mpic++ $(SOURCES) $(FLAGS) -o bin/main
 
 clear: clean
 
@@ -11,7 +11,7 @@ clean:
 	rm main
 
 run: main
-	mpirun -mca btl tcp -mca pml ^ucx -hostfile hostfile -oversubscribe -np 12 ./main
+	mpirun -mca btl tcp -mca pml ^ucx -hostfile bin/hostfile -oversubscribe -np 8 ./bin/main
 
 local: main
-	mpirun -np 8 ./main
+	mpirun -np 8 ./bin/main

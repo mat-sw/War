@@ -24,7 +24,7 @@ void *startComThread(void *ptr) {
 
                 pthread_mutex_unlock( &vecDockMut );
 
-                changeTime( lamportTime + 1 );
+                pkt.ts = lamportTime;
                 sendPacket(&pkt, pkt.src, ACK1);
                 break;
             case REQ2: // Odbieram żądanie mechaników innego statku
@@ -35,7 +35,7 @@ void *startComThread(void *ptr) {
 
                 pthread_mutex_unlock( &vecMechMut );
 
-                changeTime( lamportTime + 1 );
+                pkt.ts = lamportTime;
                 sendPacket(&pkt, pkt.src, ACK2);
                 break;
             case ACK1: // Odbieram potwierdzenie dostępu do doku od innego statku

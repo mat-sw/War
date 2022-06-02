@@ -78,7 +78,6 @@ void sendPacket(packet_t *pkt, int destination, int tag) {
         freepkt = true;
     }
     pkt->src = rank;
-    // pkt->ts = lamportTime;
     MPI_Send( pkt, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD );
     if (freepkt) delete pkt;
 }
