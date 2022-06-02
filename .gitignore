@@ -36,3 +36,7 @@
 *.pdf
 
 bin/
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
